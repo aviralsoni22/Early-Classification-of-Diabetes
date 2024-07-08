@@ -1,50 +1,61 @@
-# import library
-import uvicorn
-from fastapi import FastAPI
-from Diabetes import Dia
-import pickle
-#create an api object
-app=FastAPI()
-pickle_in = open("D://VIT Vellore//ML//Early Classification of Diabetes//Diabetes.pkl","rb")
-classifier = pickle.load(pickle_in)
-#Index route, opens atomatically on http://127.0.0.1:8000
-@app.get('/')
-def index():
-    return{'message': 'Welcome!'}
+import numpy as np
+from flask import Flask, request, render_template
+import joblib
+import logging
+import os
 
-#Route with a single parameter, returns the parameter within a message 
-#located at : http://127.0.0.1:8000/AnyNameHere
-@app.get('/{name}')
-def get_name(name:str):
-    return{'message': f'Hello, {name}'}
+app = Flask(__name__)
+logging.basicConfig(level=logging.DEBUG)
+model = None
+model_path = os.path.join(os.path.dirname(__file__), 'Diabetes.pkl')
 
-# Route with http://127.0.0.1:8000/docs
-@app.post('/predict')
-def predict_diabetes(data:Dia):
-    data=data.dict()
-    age =  data['age']
-    gender = data['gender']
-    polydipsia = data['polydipsia']
-    sudden_weight_loss = data['sudden_weight_loss']
-    weakness = data['weakness']
-    polyphagia = data['polyphagia']
-    genital_thrush = data['genital_thrush']
-    visual_blurring = data['visual_blurring']
-    itching = data['itching']
-    irritability = data['irritability']
-    delayed_healing = data['delayed_healing']
-    partial_paresis = data['partial_paresis']
-    muscle_stiffness = data['muscle_stiffness']
-    alopecia = data['alopecia']
-    obesity = data['obesity']
-    prediction = classifier.predict([[age,gender,polydipsia,sudden_weight_loss,weakness,polyphagia,genital_thrush,visual_blurring,itching,irritability,delayed_healing,partial_paresis,muscle_stiffness,alopecia,obesity]])
-    if(prediction == 1):
-        prediction = "Diabetic"
+try:
+    loaded_object = joblib.load(model_path)
+    if callable(loaded_object):
+        # If it's a function, it might be a pipeline or a custom object
+        model = loaded_object
+    elif hasattr(loaded_object, 'predict'):
+        # If it has a predict method, it's likely a sklearn model
+        model = loaded_object
     else:
-        prediction = "Not Diabetic"
-    return{
-        'prediction' : prediction
-    }
-if __name__ == '__main__':
-    uvicorn.run(app, host='127.0.0.1', port = 8000)
-#uvicorn app:app --reload
+        raise TypeError("Loaded object is neither callable nor has a 'predict' method")
+    logging.info("Model loaded successfully.")
+except FileNotFoundError:
+    logging.error(f"Model file not found at path: {model_path}")
+except Exception as e:
+    logging.error(f"Error loading model: {e}")
+
+@app.route('/')
+def home():
+    return render_template('index.html')
+
+@app.route('/predict', methods=['POST'])
+def predict():
+    try:
+        if model is None:
+            raise ValueError("Model not loaded")
+
+        # Extract features from the form
+        features = [float(x) for x in request.form.values()]
+        final_features = np.array(features).reshape(1, -1)
+        logging.info(f"Features received: {features}")
+        logging.info(f"Final features for prediction: {final_features}")
+
+        # Make a prediction
+        if callable(model):
+            prediction = model(final_features)[0]
+        else:
+            prediction = model.predict(final_features)[0]
+        logging.info(f"Prediction result: {prediction}")
+
+        # Determine prediction text
+        prediction_text = 'High chances of patient having diabetes' if prediction == 1 else 'Low chances of patient having diabetes'
+
+        return render_template('index.html', prediction_text=prediction_text)
+    except Exception as e:
+        error_message = f"Error during prediction: {str(e)}"
+        logging.error(error_message)
+        return render_template('index.html', prediction_text=error_message)
+
+if __name__ == "__main__":
+    app.run(debug=True)
