@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Diabetes Prediction Form</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #e0f7fa;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 500px;
+            box-sizing: border-box;
+            margin: 20px;
+            text-align: center;
+        }
+        h1 {
+            color: #00796b;
+            font-size: 28px;
+            margin-bottom: 20px;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        label {
+            margin-top: 10px;
+            color: #00796b;
+            font-weight: bold;
+        }
+        input[type="number"], select {
+            padding: 10px;
+            margin-top: 5px;
+            border: 2px solid #00796b;
+            border-radius: 5px;
+            width: calc(100% - 24px);
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+        button {
+            margin-top: 20px;
+            padding: 12px 20px;
+            background-color: #00796b;
+            color: #fff;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #004d40;
+        }
+        .prediction {
+            margin-top: 20px;
+            font-size: 20px;
+            color: #00796b;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Diabetes Prediction Form</h1>
+    <form method="post" action="/predict">
+        <label for="age">Age :</label>
+        <input type="number" id="age" name="age" min="0" max="100" required>
+
+        <label for="gender">Gender:</label>
+        <select id="gender" name="gender" required>
+            <option value="1">Male</option>
+            <option value="0">Female</option>
+        </select>
+
+        <label for="polyuria">Polyuria:</label>
+        <select id="polyuria" name="polyuria" required>
+            <option value="0">No</option>
+            <option value="1">Yes</option>
+        </select>
+
+        <label for="polydipsia">Polydipsia:</label>
+        <select id="polydipsia" name="polydipsia" required>
+            <option value="0">No</option>
+            <option value="1">Yes</option>
+        </select>
+
+        <label for="sudden_weight_loss">Sudden Weight Loss:</label>
+        <select id="sudden_weight_loss" name="sudden_weight_loss" required>
+            <option value="0">No</option>
+            <option value="1">Yes</option>
+        </select>
+
+        <label for="weakness">Weakness:</label>
+        <select id="weakness" name="weakness" required>
+            <option value="0">No</option>
+            <option value="1">Yes</option>
+        </select>
+
+        <label for="polyphagia">Polyphagia:</label>
+        <select id="polyphagia" name="polyphagia" required>
+            <option value="0">No</option>
+            <option value="1">Yes</option>
+        </select>
+
+        <label for="genital_thrush">Genital Thrush:</label>
+        <select id="genital_thrush" name="genital_thrush" required>
+            <option value="0">No</option>
+            <option value="1">Yes</option>
+        </select>
+
+        <label for="visual_blurring">Visual Blurring:</label>
+        <select id="visual_blurring" name="visual_blurring" required>
+            <option value="0">No</option>
+            <option value="1">Yes</option>
+        </select>
+
+        <label for="itching">Itching:</label>
+        <select id="itching" name="itching" required>
+            <option value="0">No</option>
+            <option value="1">Yes</option>
+        </select>
+
+        <label for="irritability">Irritability:</label>
+        <select id="irritability" name="irritability" required>
+            <option value="0">No</option>
+            <option value="1">Yes</option>
+        </select>
+
+        <label for="delayed_healing">Delayed Healing:</label>
+        <select id="delayed_healing" name="delayed_healing" required>
+            <option value="0">No</option>
+            <option value="1">Yes</option>
+        </select>
+
+        <label for="partial_paresis">Partial Paresis:</label>
+        <select id="partial_paresis" name="partial_paresis" required>
+            <option value="0">No</option>
+            <option value="1">Yes</option>
+        </select>
+
+        <label for="muscle_stiffness">Muscle Stiffness:</label>
+        <select id="muscle_stiffness" name="muscle_stiffness" required>
+            <option value="0">No</option>
+            <option value="1">Yes</option>
+        </select>
+
+        <label for="alopecia">Alopecia:</label>
+        <select id="alopecia" name="alopecia" required>
+            <option value="0">No</option>
+            <option value="1">Yes</option>
+        </select>
+
+        <label for="obesity">Obesity:</label>
+        <select id="obesity" name="obesity" required>
+            <option value="0">No</option>
+            <option value="1">Yes</option>
+        </select>
+
+        <button type="submit">Predict</button>
+    </form>
+
+    {% if prediction_text %}
+    <div class="prediction">
+        <h2>Prediction: {{ prediction_text }}</h2>
+    </div>
+    {% endif %}
+</div>
+</body>
+</html>
